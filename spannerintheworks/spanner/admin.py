@@ -1,4 +1,6 @@
 from django.contrib import admin, messages
+from django.utils.safestring import mark_safe
+
 from .models import Spanner, Category
 
 # Register your models here.
@@ -20,11 +22,11 @@ class CreatorFilter(admin.SimpleListFilter):
 
 @admin.register(Spanner)
 class SpannerAdmin(admin.ModelAdmin):
-    fields = ['title', 'slug', 'content', 'cat', 'creator', 'tags']
+    fields = ['title', 'slug', 'content', 'photo','post_photo', 'cat', 'creator', 'tags']
     filter_horizontal = ['tags']
-    #readonly_fields = ['slug']
+    readonly_fields = ['post_photo']
     prepopulated_fields = {"slug": ("title",)}
-    list_display = ('title', 'time_create', 'is_published', 'cat', 'brief_info')
+    list_display = ('title', 'post_photo', 'time_create', 'is_published', 'cat')
     list_display_links = ('title',)
     ordering = ['time_create', 'title']
     list_editable = ('is_published', )
@@ -32,7 +34,13 @@ class SpannerAdmin(admin.ModelAdmin):
     actions = ['set_published', 'set_draft']
     search_fields = ['title__startswith', 'cat__name']
     list_filter = [CreatorFilter, 'cat__name', 'is_published']
+    save_on_top = True
 
+    @admin.display(description="Изображение")
+    def post_photo(self, spanner: Spanner):
+        if spanner.photo:
+            return mark_safe(f"<img src='{spanner.photo.url}'width = 50 > ")
+        return "Без фото"
     @admin.display(description="Краткое описание", ordering='content')
     def brief_info(self, spanner: Spanner):
         return f"Описание {len(spanner.content)} символов."
