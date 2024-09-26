@@ -1,7 +1,7 @@
 import uuid
 
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.paginator import Paginator
 from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -87,10 +87,12 @@ def about(request):
 
 
 
-class AddPage(LoginRequiredMixin,DataMixin, CreateView):
+class AddPage( PermissionRequiredMixin,LoginRequiredMixin,DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'spanner/addpage.html'
     title_page = 'Добавление статьи'
+    permission_required = 'spanner.add_spanner'
+    permission_required = 'spanner.change_spanner'
 
     def form_valid(self, form):
         w = form.save(commit=False)
@@ -103,7 +105,7 @@ class UpdatePage(DataMixin, UpdateView):
     template_name = 'spanner/addpage.html'
     success_url = reverse_lazy('home')
 
-
+@permission_required(perm='spanner.view_spanner', raise_exception=True)
 def contact(request):
     return HttpResponse("Обратная связь")
 def login(request):

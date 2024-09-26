@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block breadcrumbs %}
+{% if perms.spanner.change_spanner %}
+<p ><a href="{% url 'edit_page' post.slug %}">Редактировать</a></p>
+{% endif %}
 <!-- Теги -->
 {% with post.tags.all as tags %}
 {% if tags %}
