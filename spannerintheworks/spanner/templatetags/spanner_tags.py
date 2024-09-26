@@ -4,9 +4,12 @@ from django.db.models import Count
 import spanner.views as views
 
 from spanner.models import Category, TagPost
+from spanner.utils import menu
 
 register = template.Library()
-
+@register.simple_tag
+def get_menu():
+    return menu
 @register.inclusion_tag('spanner/list_categories.html')
 def show_categories(cat_selected=0):
     cats = Category.objects.annotate(total=Count("posts")).filter(total__gt=0)
